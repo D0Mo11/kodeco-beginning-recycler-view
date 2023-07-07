@@ -35,18 +35,48 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.dragic.beggining_recyclerview_kodeco.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentFavoritesBinding
+import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 
 class FavoritesFragment : Fragment() {
 
-  companion object {
-    fun newInstance(): FavoritesFragment {
-      return FavoritesFragment()
-    }
-  }
+    private lateinit var adapter: CreatureAdapter
+    private lateinit var binding: FragmentFavoritesBinding
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    return inflater.inflate(R.layout.fragment_favorites, container, false)
-  }
+    companion object {
+        fun newInstance(): FavoritesFragment {
+            return FavoritesFragment()
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentFavoritesBinding.inflate(layoutInflater, container, false)
+        adapter = CreatureAdapter(CreatureStore.getCreature().toMutableList()) {
+            startActivity(context?.let { context ->
+                CreatureActivity.newIntent(
+                    context,
+                    it
+                )
+            })
+        }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.favoritesRecyclerView.adapter = adapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.let {
+            CreatureStore.getFavoriteCreatures(it)?.let { favorites ->
+                adapter.addCreatures(favorites)
+            }
+        }
+
+    }
 }
