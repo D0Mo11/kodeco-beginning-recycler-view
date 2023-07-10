@@ -45,7 +45,7 @@ class AllFragment : Fragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding get() = _binding!!
     private val adapter by lazy {
-        CreatureAdapter(
+        CreatureWithFoodAdapter(
             CreatureStore.getCreature().toMutableList()
         ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
