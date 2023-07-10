@@ -13,7 +13,8 @@
     <dimen name="nickname_text_size">14sp</dimen>
     <dimen name="list_item_food_size">@dimen/list_item_creature_size</dimen>
     <dimen name="card_elevation">3dp</dimen>
-    <dimen name="card_corner_radius">0dp</dimen>
+    <dimen name="card_corner_radius">8dp</dimen>
     <dimen name="card_image_size">150dp</dimen>
     <dimen name="card_nickname_holder_height">36dp</dimen>
+    <dimen name="creature_card_text_size">36sp</dimen>
 </resources>
