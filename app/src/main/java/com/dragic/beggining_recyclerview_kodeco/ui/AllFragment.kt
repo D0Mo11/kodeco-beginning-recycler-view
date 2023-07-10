@@ -35,6 +35,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentAllBinding
 import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
@@ -45,7 +46,7 @@ class AllFragment : Fragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding get() = _binding!!
     private val adapter by lazy {
-        CreatureWithFoodAdapter(
+        CreatureCardAdapter(
             CreatureStore.getCreature().toMutableList()
         ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
@@ -63,7 +64,13 @@ class AllFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.creatureRecyclerView.layoutManager = LinearLayoutManager(activity)
+        val layoutManager = GridLayoutManager(activity, 3, GridLayoutManager.VERTICAL, false)
+        layoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if ((position + 1) % 7 == 0) 3 else 1
+            }
+        }
+        binding.creatureRecyclerView.layoutManager = layoutManager
         binding.creatureRecyclerView.adapter = adapter
     }
 
