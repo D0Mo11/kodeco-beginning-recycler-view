@@ -33,19 +33,26 @@ package com.dragic.beggining_recyclerview_kodeco.ui
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.dragic.beggining_recyclerview_kodeco.R
 import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentAllBinding
 import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 
 class AllFragment : Fragment() {
 
+    private lateinit var layoutManager: StaggeredGridLayoutManager
     private var _binding: FragmentAllBinding? = null
     private val binding get() = _binding!!
     private val adapter by lazy {
-        CreatureAdapter(
+        CreatureCardAdapter(
             CreatureStore.getCreature().toMutableList()
         ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
@@ -56,6 +63,32 @@ class AllFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_all, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        when (id) {
+            R.id.action_span1 -> {
+                showListView()
+                return true
+            }
+
+            R.id.action_span2 -> {
+                showGridView()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAllBinding.inflate(inflater, container, false)
         return binding.root
@@ -63,12 +96,21 @@ class AllFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.creatureRecyclerView.layoutManager = LinearLayoutManager(activity)
+        layoutManager = StaggeredGridLayoutManager(2, GridLayoutManager.VERTICAL)
+        binding.creatureRecyclerView.layoutManager = layoutManager
         binding.creatureRecyclerView.adapter = adapter
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showListView() {
+        layoutManager.spanCount = 1
+    }
+
+    private fun showGridView() {
+        layoutManager.spanCount = 2
     }
 }
