@@ -42,8 +42,13 @@ import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 class FavoritesFragment : Fragment() {
 
-    private lateinit var adapter: CreatureAdapter
-    private lateinit var binding: FragmentFavoritesBinding
+    private var _binding: FragmentFavoritesBinding? = null
+    private val binding get() = _binding!!
+    private val adapter by lazy {
+        CreatureAdapter(
+            CreatureStore.getCreature().toMutableList()
+        ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
+    }
 
     companion object {
         fun newInstance(): FavoritesFragment {
@@ -52,15 +57,7 @@ class FavoritesFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentFavoritesBinding.inflate(layoutInflater, container, false)
-        adapter = CreatureAdapter(CreatureStore.getCreature().toMutableList()) {
-            startActivity(context?.let { context ->
-                CreatureActivity.newIntent(
-                    context,
-                    it
-                )
-            })
-        }
+        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -78,5 +75,10 @@ class FavoritesFragment : Fragment() {
             }
         }
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

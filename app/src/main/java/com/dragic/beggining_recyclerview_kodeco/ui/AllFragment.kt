@@ -42,8 +42,13 @@ import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 class AllFragment : Fragment() {
 
-    private lateinit var binding: FragmentAllBinding
-    private lateinit var adapter: CreatureAdapter
+    private var _binding: FragmentAllBinding? = null
+    private val binding get() = _binding!!
+    private val adapter by lazy {
+        CreatureAdapter(
+            CreatureStore.getCreature().toMutableList()
+        ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
+    }
 
     companion object {
         fun newInstance(): AllFragment {
@@ -52,15 +57,7 @@ class AllFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentAllBinding.inflate(layoutInflater, container, false)
-        adapter = CreatureAdapter(CreatureStore.getCreature().toMutableList()) {
-            startActivity(context?.let { context ->
-                CreatureActivity.newIntent(
-                    context,
-                    it
-                )
-            })
-        }
+        _binding = FragmentAllBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -68,5 +65,10 @@ class AllFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.creatureRecyclerView.layoutManager = LinearLayoutManager(activity)
         binding.creatureRecyclerView.adapter = adapter
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
