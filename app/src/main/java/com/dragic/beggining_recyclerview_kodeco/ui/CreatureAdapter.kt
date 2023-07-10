@@ -2,6 +2,7 @@ package com.dragic.beggining_recyclerview_kodeco.ui
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +50,14 @@ class CreatureAdapter(private val creatures: MutableList<Creature>, val onCreatu
             binding.creatureImage.setImageResource(context.resources.getIdentifier(creature.uri, null, context.packageName))
             binding.fullName.text = creature.fullName
             binding.nickname.text = creature.nickname
+            animateView(binding.root)
+        }
+
+        private fun animateView(viewToAnimate: View) {
+            if (viewToAnimate.animation == null) {
+                val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.scale_xy)
+                viewToAnimate.animation = animation
+            }
         }
     }
 }

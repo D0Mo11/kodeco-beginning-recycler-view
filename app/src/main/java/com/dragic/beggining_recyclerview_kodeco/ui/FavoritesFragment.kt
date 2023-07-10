@@ -35,7 +35,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dragic.beggining_recyclerview_kodeco.R
 import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentFavoritesBinding
 import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
@@ -65,6 +67,10 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(activity)
         binding.favoritesRecyclerView.adapter = adapter
+        val heightInPixels = resources.getDimensionPixelSize(R.dimen.list_item_divider_height)
+        context?.let {
+            binding.favoritesRecyclerView.addItemDecoration(DividerItemDecoration(ContextCompat.getColor(it, R.color.black), heightInPixels))
+        }
     }
 
     override fun onResume() {
