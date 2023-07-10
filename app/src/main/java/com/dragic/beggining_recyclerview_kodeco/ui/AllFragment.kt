@@ -35,26 +35,40 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.dragic.beggining_recyclerview_kodeco.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentAllBinding
+import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 
 class AllFragment : Fragment() {
 
-  companion object {
-    fun newInstance(): AllFragment {
-      return AllFragment()
+    private var _binding: FragmentAllBinding? = null
+    private val binding get() = _binding!!
+    private val adapter by lazy {
+        CreatureAdapter(
+            CreatureStore.getCreature().toMutableList()
+        ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
-  }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    return inflater.inflate(R.layout.fragment_all, container, false)
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    view.setOnClickListener { _ ->
-      startActivity(CreatureActivity.newIntent(view.context, 1))
+    companion object {
+        fun newInstance(): AllFragment {
+            return AllFragment()
+        }
     }
-  }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentAllBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.creatureRecyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.creatureRecyclerView.adapter = adapter
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
