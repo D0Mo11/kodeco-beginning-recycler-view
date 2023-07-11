@@ -49,7 +49,7 @@ import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 
 class AllFragment : Fragment() {
 
-    private lateinit var layoutManager: StaggeredGridLayoutManager
+    private lateinit var layoutManager: GridLayoutManager
     private lateinit var listItemDecoration: ItemDecoration
     private lateinit var gridItemDecoration: ItemDecoration
     private lateinit var listMenuItem: MenuItem
@@ -126,7 +126,12 @@ class AllFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        layoutManager = StaggeredGridLayoutManager(2, GridLayoutManager.VERTICAL)
+        layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return (adapter.spanSizeAtPosition(position))
+            }
+        }
         binding.creatureRecyclerView.layoutManager = layoutManager
         binding.creatureRecyclerView.adapter = adapter
         val spacingInPixels = resources.getDimensionPixelSize(R.dimen.creature_card_grid_layout_margin)
@@ -137,9 +142,9 @@ class AllFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 adapter.scrollDirection = if (dy > 0) {
-                    CreatureCardAdapter.Scrolldirection.DOWN
+                    CreatureCardAdapter.ScrollDirection.DOWN
                 } else {
-                    CreatureCardAdapter.Scrolldirection.UP
+                    CreatureCardAdapter.ScrollDirection.UP
                 }
             }
         })
@@ -152,6 +157,7 @@ class AllFragment : Fragment() {
 
     private fun updateRecyclerView(spanCount: Int, addItemDecoration: RecyclerView.ItemDecoration, removeItemDecoration: ItemDecoration) {
         layoutManager.spanCount = spanCount
+        adapter.jupiterSpanSize = spanCount
         binding.creatureRecyclerView.removeItemDecoration(removeItemDecoration)
         binding.creatureRecyclerView.addItemDecoration(addItemDecoration)
     }

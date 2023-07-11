@@ -13,22 +13,29 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dragic.beggining_recyclerview_kodeco.R
+import com.dragic.beggining_recyclerview_kodeco.app.Constants
 import com.dragic.beggining_recyclerview_kodeco.app.inflate
 import com.dragic.beggining_recyclerview_kodeco.databinding.ListItemCreatureBinding
 import com.dragic.beggining_recyclerview_kodeco.databinding.ListItemCreatureCardBinding
+import com.dragic.beggining_recyclerview_kodeco.databinding.ListItemCreatureCardJupiterBinding
 import com.dragic.beggining_recyclerview_kodeco.databinding.ListItemCreatureWithFoodBinding
 import com.dragic.beggining_recyclerview_kodeco.model.Creature
 
 class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCreatureSelect: ((Int) -> Unit)) :
     ListAdapter<Creature, CreatureCardAdapter.ViewHolder>(CreatureItemDiffCallback()) {
-    enum class Scrolldirection {
+    enum class ScrollDirection {
         UP, DOWN
     }
 
-    var scrollDirection = Scrolldirection.DOWN
+    enum class ViewType {
+        JUPITER, OTHERS
+    }
+
+    var scrollDirection = ScrollDirection.DOWN
+    var jupiterSpanSize = 2
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreatureCardAdapter.ViewHolder {
-        val itemBinding = ListItemCreatureCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val itemBinding = ListItemCreatureCardJupiterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(itemBinding)
     }
 
@@ -38,7 +45,13 @@ class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCr
 
     override fun getItemCount(): Int = creatures.size
 
-    inner class ViewHolder(private val itemBinding: ListItemCreatureCardBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+    override fun getItemViewType(position: Int): Int {
+        val creature = creatures[position]
+        return if (creature.planet == Constants.JUPITER) ViewType.JUPITER.ordinal else ViewType.OTHERS.ordinal
+    }
+
+    fun spanSizeAtPosition(position: Int): Int = if (creatures[position].planet == Constants.JUPITER) jupiterSpanSize else 1
+    inner class ViewHolder(private val itemBinding: ListItemCreatureCardJupiterBinding) : RecyclerView.ViewHolder(itemBinding.root) {
         private lateinit var creature: Creature
 
         init {
@@ -51,6 +64,9 @@ class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCr
             val imageResource = context.resources.getIdentifier(creature.uri, null, context.packageName)
             itemBinding.creatureImage.setImageResource(imageResource)
             itemBinding.fullName.text = creature.fullName
+            if (creature.planet == Constants.JUPITER) {
+                itemBinding.slogan.visibility = View.VISIBLE
+            }
             setBackgroundColors(context, imageResource)
             animateView(itemBinding.root)
         }
@@ -75,7 +91,7 @@ class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCr
 
         private fun animateView(viewToAnimate: View) {
             if (viewToAnimate.animation == null) {
-                val animId = if (scrollDirection == Scrolldirection.DOWN) R.anim.slide_from_bottom else R.anim.slide_from_top
+                val animId = if (scrollDirection == ScrollDirection.DOWN) R.anim.slide_from_bottom else R.anim.slide_from_top
                 val animation = AnimationUtils.loadAnimation(viewToAnimate.context, animId)
                 viewToAnimate.animation = animation
             }
