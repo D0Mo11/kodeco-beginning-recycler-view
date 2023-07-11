@@ -48,7 +48,7 @@ class FavoritesFragment : Fragment() {
     private val binding get() = _binding!!
     private val adapter by lazy {
         CreatureAdapter(
-            CreatureStore.getCreature().toMutableList()
+            mutableListOf()
         ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
 
@@ -76,8 +76,9 @@ class FavoritesFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         activity?.let {
-            CreatureStore.getFavoriteCreatures(it)?.let { favorites ->
-                adapter.addCreatures(favorites)
+            val composites = CreatureStore.getFavoriteComposites(it)
+            composites?.let { compositeItems ->
+                adapter.addCreatures(compositeItems)
             }
         }
 
