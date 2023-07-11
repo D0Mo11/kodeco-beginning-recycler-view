@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.DiffUtil
@@ -20,6 +21,11 @@ import com.dragic.beggining_recyclerview_kodeco.model.Creature
 
 class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCreatureSelect: ((Int) -> Unit)) :
     ListAdapter<Creature, CreatureCardAdapter.ViewHolder>(CreatureItemDiffCallback()) {
+    enum class Scrolldirection {
+        UP, DOWN
+    }
+
+    var scrollDirection = Scrolldirection.DOWN
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreatureCardAdapter.ViewHolder {
         val itemBinding = ListItemCreatureCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -46,6 +52,7 @@ class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCr
             itemBinding.creatureImage.setImageResource(imageResource)
             itemBinding.fullName.text = creature.fullName
             setBackgroundColors(context, imageResource)
+            animateView(itemBinding.root)
         }
 
         private fun setBackgroundColors(context: Context, imageResource: Int) {
@@ -64,6 +71,14 @@ class CreatureCardAdapter(private val creatures: MutableList<Creature>, val onCr
         private fun isColorDark(color: Int): Boolean {
             val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
             return darkness >= 0.5
+        }
+
+        private fun animateView(viewToAnimate: View) {
+            if (viewToAnimate.animation == null) {
+                val animId = if (scrollDirection == Scrolldirection.DOWN) R.anim.slide_from_bottom else R.anim.slide_from_top
+                val animation = AnimationUtils.loadAnimation(viewToAnimate.context, animId)
+                viewToAnimate.animation = animation
+            }
         }
     }
 }

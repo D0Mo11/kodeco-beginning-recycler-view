@@ -35,6 +35,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dragic.beggining_recyclerview_kodeco.R
@@ -122,5 +123,7 @@ class CreatureActivity : AppCompatActivity() {
         binding.foodRecyclerView.adapter = adapter
         val foods = CreatureStore.getCreatureFoods(creature)
         adapter.addFoods(foods)
+        val dividerWidthInPixels = resources.getDimensionPixelSize(R.dimen.list_item_divider_height)
+        binding.foodRecyclerView.addItemDecoration(FoodItemDecoration(ContextCompat.getColor(this, R.color.black), dividerWidthInPixels))
     }
 }

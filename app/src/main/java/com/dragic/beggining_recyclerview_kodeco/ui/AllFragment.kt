@@ -39,7 +39,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dragic.beggining_recyclerview_kodeco.R
 import com.dragic.beggining_recyclerview_kodeco.databinding.FragmentAllBinding
@@ -49,7 +50,17 @@ import com.dragic.beggining_recyclerview_kodeco.model.CreatureStore
 class AllFragment : Fragment() {
 
     private lateinit var layoutManager: StaggeredGridLayoutManager
+    private lateinit var listItemDecoration: ItemDecoration
+    private lateinit var gridItemDecoration: ItemDecoration
+    private lateinit var listMenuItem: MenuItem
+    private lateinit var gridMenuItem: MenuItem
+    private var gridState = GridState.GRID
     private var _binding: FragmentAllBinding? = null
+
+    private enum class GridState {
+        LIST, GRID
+    }
+
     private val binding get() = _binding!!
     private val adapter by lazy {
         CreatureCardAdapter(
@@ -73,16 +84,35 @@ class AllFragment : Fragment() {
         inflater.inflate(R.menu.menu_all, menu)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        listMenuItem = menu.findItem(R.id.action_span1)
+        gridMenuItem = menu.findItem(R.id.action_span2)
+        when (gridState) {
+            GridState.LIST -> {
+                listMenuItem.isEnabled = false
+                gridMenuItem.isEnabled = true
+            }
+
+            GridState.GRID -> {
+                listMenuItem.isEnabled = true
+                gridMenuItem.isEnabled = false
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         when (id) {
             R.id.action_span1 -> {
-                showListView()
+                gridState = GridState.LIST
+                updateRecyclerView(1, listItemDecoration, gridItemDecoration)
                 return true
             }
 
             R.id.action_span2 -> {
-                showGridView()
+                gridState = GridState.GRID
+                updateRecyclerView(2, gridItemDecoration, listItemDecoration)
                 return true
             }
         }
@@ -99,6 +129,20 @@ class AllFragment : Fragment() {
         layoutManager = StaggeredGridLayoutManager(2, GridLayoutManager.VERTICAL)
         binding.creatureRecyclerView.layoutManager = layoutManager
         binding.creatureRecyclerView.adapter = adapter
+        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.creature_card_grid_layout_margin)
+        listItemDecoration = SpacingItemDecoration(1, spacingInPixels)
+        gridItemDecoration = SpacingItemDecoration(2, spacingInPixels)
+        binding.creatureRecyclerView.addItemDecoration(gridItemDecoration)
+        binding.creatureRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                adapter.scrollDirection = if (dy > 0) {
+                    CreatureCardAdapter.Scrolldirection.DOWN
+                } else {
+                    CreatureCardAdapter.Scrolldirection.UP
+                }
+            }
+        })
     }
 
     override fun onDestroyView() {
@@ -106,11 +150,9 @@ class AllFragment : Fragment() {
         _binding = null
     }
 
-    private fun showListView() {
-        layoutManager.spanCount = 1
-    }
-
-    private fun showGridView() {
-        layoutManager.spanCount = 2
+    private fun updateRecyclerView(spanCount: Int, addItemDecoration: RecyclerView.ItemDecoration, removeItemDecoration: ItemDecoration) {
+        layoutManager.spanCount = spanCount
+        binding.creatureRecyclerView.removeItemDecoration(removeItemDecoration)
+        binding.creatureRecyclerView.addItemDecoration(addItemDecoration)
     }
 }
