@@ -20,9 +20,10 @@ class CreatureItemDiffCallback : DiffUtil.ItemCallback<Creature>() {
     override fun areContentsTheSame(oldItem: Creature, newItem: Creature): Boolean = oldItem.id == newItem.id
 }
 
-class CreatureAdapter(private val compositeItems: MutableList<CompositeItem>, val onCreatureSelect: ((Int) -> Unit)) :
+class CreatureAdapter(compositeItems: List<CompositeItem>, val onCreatureSelect: ((Int) -> Unit)) :
     ListAdapter<Creature, RecyclerView.ViewHolder>(CreatureItemDiffCallback()) {
 
+    private val _compositeItems = compositeItems.toMutableList()
     enum class ViewType {
         HEADER, CREATURE,
     }
@@ -37,15 +38,15 @@ class CreatureAdapter(private val compositeItems: MutableList<CompositeItem>, va
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is HeaderViewHolder -> holder.bindHeader(compositeItems[position])
-            is CreatureViewHolder -> holder.bindCreature(compositeItems[position])
+            is HeaderViewHolder -> holder.bindHeader(_compositeItems[position])
+            is CreatureViewHolder -> holder.bindCreature(_compositeItems[position])
         }
     }
 
-    override fun getItemCount(): Int = compositeItems.size
+    override fun getItemCount(): Int = _compositeItems.size
 
     override fun getItemViewType(position: Int): Int {
-        return if (compositeItems[position].isHeader) {
+        return if (_compositeItems[position].isHeader) {
             ViewType.HEADER.ordinal
         } else {
             ViewType.CREATURE.ordinal
@@ -53,8 +54,8 @@ class CreatureAdapter(private val compositeItems: MutableList<CompositeItem>, va
     }
 
     fun addCreatures(creatures: List<CompositeItem>) {
-        this.compositeItems.clear()
-        this.compositeItems.addAll(creatures)
+        this._compositeItems.clear()
+        this._compositeItems.addAll(creatures)
         notifyDataSetChanged()
     }
 

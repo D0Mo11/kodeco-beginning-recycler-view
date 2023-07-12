@@ -48,7 +48,7 @@ class FavoritesFragment : Fragment() {
     private val binding get() = _binding!!
     private val adapter by lazy {
         CreatureAdapter(
-            mutableListOf()
+            listOf()
         ) { startActivity(context?.let { context -> CreatureActivity.newIntent(context, it) }) }
     }
 
